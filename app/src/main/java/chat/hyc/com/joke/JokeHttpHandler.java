@@ -76,7 +76,6 @@ public class JokeHttpHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 Element tipsP=doc.select("p").get(1);
                 Element tipsA= tipsP.select("a").first();
                 Element img=tipsA.select("img").first();
