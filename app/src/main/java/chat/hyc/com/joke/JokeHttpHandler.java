@@ -1,15 +1,11 @@
 package chat.hyc.com.joke;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,19 +67,16 @@ public class JokeHttpHandler {
             @Override
             public void run() {
                 Document doc=null;
-                if (nextUri==null){
-                    try {
+                try {
+                    if (nextUri==null){
                         doc = Jsoup.connect(address).get();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }else {
-                    try {
+                    }else {
                         doc = Jsoup.connect(nextUri).get();
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
                 Element tipsP=doc.select("p").get(1);
                 Element tipsA= tipsP.select("a").first();
                 Element img=tipsA.select("img").first();
@@ -102,8 +95,9 @@ public class JokeHttpHandler {
                 Message m=new Message();
                 m.obj=joke;
                 handler.sendMessage(m);
-            }
-        }).start();
 
+            }
+
+        }).start();
     }
 }

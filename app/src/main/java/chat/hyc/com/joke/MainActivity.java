@@ -56,9 +56,7 @@ public class MainActivity extends Activity  {
             @Override
             public void complete(List<Joke> list) {
                 jokeAdapter=new JokeAdapter(MainActivity.this,list);
-                Log.d("TAG","list's count is"+list.size());
                 rv_joke.setAdapter(jokeAdapter);
-                Log.d("TAG","加载数据到RecycleView中");
                 sl_joke.setRefreshing(false);
             }
         });
