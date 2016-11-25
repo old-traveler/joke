@@ -95,7 +95,6 @@ public class JokeHttpHandler {
                 Message m=new Message();
                 m.obj=joke;
                 handler.sendMessage(m);
-
             }
 
         }).start();
