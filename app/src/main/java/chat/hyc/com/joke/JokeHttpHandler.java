@@ -1,11 +1,10 @@
 package chat.hyc.com.joke;
 
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,41 +15,13 @@ import java.util.List;
 
 public class JokeHttpHandler {
 
-    private static String nextUri=null;
-
-    public JokeHttpListener jokeListener;
-
-    private int currentCount;
-
     private List<Joke> list;
-
-    private int count=0;
 
     public interface JokeHttpListener{
         void complete(List<Joke> list);
     }
 
-    private Handler handler=new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if (list==null){
-                list=new ArrayList<Joke>();
-            }
-            currentCount++;
-            if (currentCount==count){
-                jokeListener.complete(list);
-            }else {
-                Joke j=(Joke) msg.obj;
-                Log.d("TAG","j 是"+j.getJokeContent());
-                Log.d("TAG","下个网址"+nextUri);
-                list.add(j);
-                getJokeHttpData(count,null);
-            }
-
-        }
-    };
-    private final static String address = "http://www.yikedou.com/wenzi/201611/73833.html?uchz161122";
+    private final static String address = "http://www.pengfu.com/index_";
 
     private static JokeHttpHandler jokeHttpHandler;
 
@@ -61,41 +32,63 @@ public class JokeHttpHandler {
         return jokeHttpHandler;
     }
 
-    public void getJokeHttpData(int count, final JokeHttpListener jokeHttpListener){
-        this.count=count;
+    /**
+     * 根据传入的页码请求对应网页上的HTML文档数据
+     * @param page
+     * @param jokeHttpListener
+     */
+    public void getJokeHttpData(final int page, final JokeHttpListener jokeHttpListener){
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Document doc=null;
                 try {
-                    if (nextUri==null){
-                        doc = Jsoup.connect(address).get();
-                    }else {
-                        doc = Jsoup.connect(nextUri).get();
-                    }
+                    doc = Jsoup.connect(address+page+".html").get();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Element tipsP=doc.select("p").get(1);
-                Element tipsA= tipsP.select("a").first();
-                Element img=tipsA.select("img").first();
-                String uri=tipsA.attr("href");
-                String imageUri=img.attr("src");
-                String content=doc.select("p").first().text();
-                String title=tipsP.text();
-                final Joke joke=new Joke();
-                joke.setJokeTitle(title);
-                joke.setJokeContent(content);
-                joke.setJokeImage("http://www.yikedou.com"+imageUri);
-                nextUri="http://www.yikedou.com"+uri;
-                if (jokeHttpListener!=null){
-                    jokeListener=jokeHttpListener;
-                }
-                Message m=new Message();
-                m.obj=joke;
-                handler.sendMessage(m);
+                jokeHttpListener.complete(analysisHttpData(doc));
             }
 
         }).start();
+    }
+
+    /**
+     * 解析从网页上获取的HTML文档
+     */
+    private List<Joke> analysisHttpData(Document document){
+        list=new ArrayList<Joke>();
+        Element body=document.body();
+        Elements items=body.select("dl");
+        for(Element item:items){
+            Joke joke=new Joke();
+            if (item.select("h1").first()==null){
+                Log.d("TAG","h1是一个空对象");
+            }else {
+                String title=item.select("h1").first().text();
+                joke.setJokeTitle(title);
+            }
+            if (item.select("div").select("img").first()==null){
+                joke.setImageType("noImage");
+                if(item.attr("class").equals("clearfix dl-con")){
+                    joke.setJokeContent(item.select("div").text());
+                }
+            }else {
+                Element image=item.select("div").select("img").first();
+                String  imageUri=image.attr("src");
+                String  gifUri=image.attr("gifsrc");
+                if (!gifUri.equals("")){
+                    joke.setImageType("gif");
+                    joke.setJokeImage(imageUri);
+                    joke.setGifImage(gifUri);
+                }else {
+                    joke.setImageType("image");
+                    joke.setJokeImage(imageUri);
+                }
+            }
+            list.add(joke);
+        }
+        return list;
     }
 }

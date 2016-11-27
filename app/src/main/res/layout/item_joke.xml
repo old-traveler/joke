@@ -4,6 +4,7 @@
         <variable name="joke" type="chat.hyc.com.joke.Joke"/>
     </data>
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -16,14 +17,23 @@
             android:id="@+id/tv_joke_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-        <ImageView
-            android:id="@+id/iv_joke_image"
-            android:scaleType="fitCenter"
-            android:maxHeight="200dp"
-            android:maxWidth="300dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/cv"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="true"
+            tools:context=".GroupsActivity">
+            <ImageView
+                android:id="@+id/iv_joke_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+        </android.support.v7.widget.CardView>
 
     </LinearLayout>
 </layout>

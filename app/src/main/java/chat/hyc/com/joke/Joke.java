@@ -7,9 +7,10 @@ package chat.hyc.com.joke;
 public class Joke {
     private String jokeContent;
     private String jokeImage;
-    private String nextJoke;
+    private String imageType;
     private String jokeTitle;
-    private int position;
+    private String gifImage;
+
 
     public String getJokeContent() {
         return jokeContent;
@@ -27,14 +28,6 @@ public class Joke {
         this.jokeImage = jokeImage;
     }
 
-    public String getNextJoke() {
-        return nextJoke;
-    }
-
-    public void setNextJoke(String nextJoke) {
-        this.nextJoke = nextJoke;
-    }
-
     public String getJokeTitle() {
         return jokeTitle;
     }
@@ -43,11 +36,19 @@ public class Joke {
         this.jokeTitle = jokeTitle;
     }
 
-    public int getPosition() {
-        return position;
+    public String getImageType() {
+        return imageType;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
+    }
+
+    public String getGifImage() {
+        return gifImage;
+    }
+
+    public void setGifImage(String gifImage) {
+        this.gifImage = gifImage;
     }
 }

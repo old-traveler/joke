@@ -6,7 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,6 +24,8 @@ public class MainActivity extends Activity {
     private SwipeRefreshLayout sl_joke;
 
     private JokeHttpHandler jokeHttpHandler;
+
+    private static int page=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +53,37 @@ public class MainActivity extends Activity {
         if (jokeHttpHandler == null) {
             jokeHttpHandler = JokeHttpHandler.getInstance();
         }
-        jokeHttpHandler.getJokeHttpData(5, new JokeHttpHandler.JokeHttpListener() {
+        jokeHttpHandler.getJokeHttpData(page, new JokeHttpHandler.JokeHttpListener() {
             @Override
             public void complete(List<Joke> list) {
                 jokeAdapter = new JokeAdapter(MainActivity.this, list);
-                rv_Joke.setAdapter(jokeAdapter);
-                sl_joke.setRefreshing(false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        rv_Joke.setAdapter(jokeAdapter);
+                        sl_joke.setRefreshing(false);
+                        jokeAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+                            @Override
+                            public void onLoadMoreRequested() {
+                                page++;
+                                jokeHttpHandler.getJokeHttpData(page, new JokeHttpHandler.JokeHttpListener() {
+                                    @Override
+                                    public void complete(final List<Joke> list) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                jokeAdapter.addData(list);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
         });
+
     }
 
     @Override
